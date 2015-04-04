@@ -2,103 +2,94 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
 #include <iostream>
 
 struct node {
-	char id[200];
-	int value;
+	int value; // Use this value to access the id in strings
+	int index;
 	int left;
 	int right;
 	int parent;
 };
 
+char strings[50005][100];
 node nodes[50005];
+
 int n; // number of nodes
 
 void print(int n);
-int stringCompare(node a, node b);
-int buildTree(int n);
-
-void print_node(node *n) {
-	printf("id: %s\tvalue:%d\n", n->id, n->value);
-}
+void addNode(int index);
+int stringCompare(int a, int b);
 
 int main() {
 	scanf("%d", &n);
 	putchar(n);
 	while (n != 0) {
-		for (int i=0; i<n; i++) {
-			scanf("%*[ ]%[a-z]/%d", nodes[i].id, &nodes[i].value); // %s kills everything
-			nodes[i].right = -1;
-			nodes[i].left = -1;
-			nodes[i].parent = -1;
-		//	print_node(&nodes[i]);
+		int tmpLoc[n+1];
+		int tmpVal[n+1];
+		for (int i=1; i<n+1; i++) {
+			int x;
+			scanf("%*[ ]%[a-z]/%d", strings[i], &x); // %s kills everything
+			tmpVal[i] = x;
+			tmpLoc[i] = i;
+			nodes[i].right = 0;
+			nodes[i].left = 0;
+			nodes[i].parent = 0;
+			nodes[i].index = i;
 		}
-		std::sort(nodes, nodes+n, stringCompare); // Sort all nodes by strings, so they print in order
-//		for (int i=0;i<n;i++) {
-//			print_node(&nodes[i]);
-//		}
-		int root = buildTree(n); 
-		printf("ALEPH: built tree\n");
-		print(root);
-		putchar('\n');
+		// Do stuff here to print the monstrosity
+		nodes[0].value = 9999999; // Large enough not to be an issue
+		nodes[0].parent = 0;
+		nodes[0].left = 0;
+		nodes[0].right = 0;
+
+		// Sort by string for heap like deliciousness
+		std::sort(tmpVal+1, tmpVal+1+n, stringCompare);
+
+		for(int j=1; j<n+1; j++) {
+			nodes[j].value = tmpVal[tmpLoc[j]];
+			nodes[j].index = tmpLoc[j];
+		}
+
+		for (int k=1; k<n+1; k++) {
+			addNode(k);
+		}
+		print(nodes[0].right);
 		scanf("\n%d", &n);
 	}
 
 	return 0;
 }
 
-int stringCompare(node a, node b) {
-	if (strcmp(a.id, b.id) != 0) { // Different
-		return 1;
+int stringCompare(int a, int b) {
+	return strcmp(strings[a], strings[b]) < 0;
+}
+
+void print(int n) { // Rewrite
+	if (n == 0) {
+		return;
 	} else {
-		return 0;
+		putchar('(');
+		if (nodes[n].right != 0) {
+			print(nodes[n].right);
+		}
+	
+	 	printf("%s/%d", (strings[nodes[n].index]), nodes[n].value);
+	
+		if (nodes[n].left != 0) {
+			print(nodes[n].left);
+		}
+		putchar(')');
 	}
 }
 
-void print(int n) {
-	putchar('(');
-	if (nodes[n].right != -1) {
-		print(nodes[n].right);
+void addNode (int index) {
+	int parent = index-1;
+	while (nodes[parent].value < nodes[index].value) {
+		int p = nodes[p].parent;
 	}
-
- 	printf("%s/%d", (nodes[n].id), nodes[n].value);
-
-	if (nodes[n].left != -1) {
-		print(nodes[n].left);
-	}
-	putchar(')');
+	nodes[index].parent = parent;
+	nodes[index].left = nodes[parent].right;
+	nodes[parent].right = index;
 }
 
-
-int buildTree(int n) {
-	std::vector<int> stack;
-	stack.push_back(0);
-
-	for (int i=1; i<n; i++) { 
-		std::vector<int>::reverse_iterator rit = stack.rbegin();
-		while (rit != stack.rend() && nodes[*rit].value < nodes[i].value) { // This is dependent on it being sorted first
-			++ rit;
-		}
-		for (std::vector<int>::const_iterator it = stack.begin(); it != stack.end(); it++) {
-			std::cout << *it << ' ';
-		}
-		putchar('\n');
-
-		int prev = *rit;
-		int zero = stack.front(); //stk[0]
-		if (1) { // Still children to add
-			nodes[i].parent = prev;
-			nodes[nodes[prev].right].parent = i;
-			nodes[i].left = nodes[prev].right;
-			nodes[prev].right = i;
-		} else {
-			printf("BETH: final value\n");
-			nodes[i].left = zero;
-			nodes[zero].parent = i;
-		}
-		stack.push_back(i);
-	}
-	return stack.front(); // Root value
-}

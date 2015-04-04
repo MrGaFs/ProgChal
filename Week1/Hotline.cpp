@@ -8,18 +8,11 @@ int main() {
   // Read in
   scanf("%d\n", &dialogues);
   for (int i=0; i<dialogues; i++) {
-    char current = getchar();
-    while (current!= '!') {
-      for (int j=0; j<100; j++) {
-        if (current == '\n') {
-          continue;
-        }
-        for (int k=0; k<100; k++) {
-          lines[j][k] = current;
-        }
-      }
-      current = getchar();
-    }
+    // Read in the dialogue, record length
+    int length = 0;
+    
   }
   return EXIT_SUCCESS;
 }
+
+void printResponse()
