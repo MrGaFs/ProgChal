@@ -39,13 +39,12 @@ int main() {
         putchar('\n');
 
 
-
         for (int i=0; i<length; i++) {
             printf("%d ", inc[i]);
         }
         putchar('\n');
         for (int i=0; i<length; i++) {
-            printf("%d ", dec[i]);
+            printf("%d ", dec[length-1-i]);
         }
         putchar('\n');
 */
@@ -115,17 +114,14 @@ void longestDecreasing() {
 }
 
 int calculateMax() {
-	int maxI = 0;
-	int maxD = 0;
+	int max = 0;
 	for (int i=0; i<length; i++) {
-		if (inc[i] > maxI) {
-			maxI = inc[i];
-		}
-		if (dec[length-1-i] > maxD) {
-			maxD = dec[length-1-i];
+		int tmp = std::min(inc[i], dec[length-1-i]);
+		if (tmp > max) {
+				max = tmp;
 		}
 	}
-	return std::min(maxI, maxD);
+	return max;
 }
 
 void clear() {
